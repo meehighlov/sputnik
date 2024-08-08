@@ -1,4 +1,4 @@
-package reminder
+package events
 
 import (
 	"context"
@@ -9,16 +9,16 @@ import (
 	"github.com/meehighlov/sputnik/pkg/telegram"
 )
 
-func ReminderHandler(event telegram.Event) error {
+func EventsHandler(event telegram.Event) error {
 	ctx, cancel := context.WithTimeout(context.Background(), config.Cfg().HandlerTmeout())
 	defer cancel()
 
-	msgTemplate := "Выбери опцию:\n\n%s"
+	msgTemplate := "Выбери опцию\n\n%s"
 
 	options := []string{
-		"/add_reminder",
-		"/remove_reminder",
-		"/list_reminder",
+		"/add_event",
+		"/remove_event",
+		"/list_event",
 	}
 
 	msg := fmt.Sprintf(msgTemplate, strings.Join(options, "\n"))

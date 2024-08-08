@@ -53,8 +53,19 @@ func create_tables(logger *slog.Logger) error {
 		UNIQUE(tgid)
 	);`
 
+	create_event_table_sql := `CREATE TABLE IF NOT EXISTS event (
+		id VARCHAR PRIMARY KEY,
+		chatid VARCHAR,
+		text VARCHAR,
+		notifyat VARCHAR,
+		delta VARCHAR,
+		createdat VARCHAR,
+		updatedat VARCHAR
+	);`
+
 	for _, table := range []string{
 		create_user_table_sql,
+		create_event_table_sql,
 	} {
 		err := create_table(table, logger)
 		if err != nil {

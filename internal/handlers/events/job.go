@@ -7,11 +7,11 @@ import (
 	"github.com/meehighlov/sputnik/internal/config"
 )
 
-func StartJob(
+func RunEventPoller(
 	ctx context.Context,
 	logger *slog.Logger,
 	cfg *config.Config,
 ) error {
-	
+
 	return nil
 }

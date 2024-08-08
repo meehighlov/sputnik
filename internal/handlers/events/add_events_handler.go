@@ -5,6 +5,7 @@ import (
 	"log/slog"
 
 	"github.com/meehighlov/sputnik/internal/config"
+	"github.com/meehighlov/sputnik/internal/db"
 	"github.com/meehighlov/sputnik/pkg/telegram"
 )
 
@@ -41,6 +42,22 @@ func addEventSave(event telegram.Event) (int, error) {
 
 	slog.Debug("timestamp", timestamp)
 	slog.Debug("event text", eventText)
+
+	message := event.GetMessage()
+
+	e, err := db.NewEvent(
+		message.Chat.Id,
+		message.From.Id,
+		eventText,
+		timestamp,
+	)
+
+	if err != nil {
+		event.Reply(ctx, "Ошибка добавления события: " + err.Error() +"\nпопробуй снова")
+		return 3, nil
+	}
+
+	e.Save(ctx)
 
 	msg := "Событие сохранено"
 	event.Reply(ctx, msg)

@@ -56,6 +56,7 @@ func create_tables(logger *slog.Logger) error {
 	create_event_table_sql := `CREATE TABLE IF NOT EXISTS event (
 		id VARCHAR PRIMARY KEY,
 		chatid VARCHAR,
+		ownerid INTEGER,
 		text VARCHAR,
 		notifyat VARCHAR,
 		delta VARCHAR,

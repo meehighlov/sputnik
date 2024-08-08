@@ -81,3 +81,32 @@ func (user *User) Filter(ctx context.Context) ([]User, error) {
 
 	return users, nil
 }
+
+// idempotent save
+// accepts ALL fields of entity and save as is
+func (e *Event) Save(ctx context.Context) error {
+	_, _, _ = e.RefresTimestamps()
+
+	_, err := sqliteConn.ExecContext(
+		ctx,
+		`INSERT INTO event(id, chatid, ownerid, text, notifyat, delta, createdat, updatedat)
+        VALUES($1, $2, $3, $4, $5, $6, $7, $8)
+        ON CONFLICT(id) DO UPDATE SET chatid=$2, ownerid=$3, text=$4, notifyat=$5, delta=$6, chatid=$7, updatedat=$8
+        RETURNING id;`,
+		&e.ID,
+		&e.ChatId,
+		&e.OwnerId,
+		&e.Text,
+		&e.NotifyAt,
+		&e.Delta,
+		&e.CreatedAt,
+		&e.UpdatedAt,
+	)
+	if err != nil {
+		slog.Error("Error when trying to save event: " + err.Error())
+		return err
+	}
+	slog.Debug("Event created/updated")
+
+	return nil
+}

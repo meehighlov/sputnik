@@ -45,7 +45,7 @@ func addEventSave(event telegram.Event) (int, error) {
 
 	message := event.GetMessage()
 
-	e, err := db.NewEvent(
+	e, err := db.BuildEvent(
 		message.Chat.Id,
 		message.From.Id,
 		eventText,

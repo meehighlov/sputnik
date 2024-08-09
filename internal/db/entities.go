@@ -3,6 +3,7 @@ package db
 import (
 	"errors"
 	"fmt"
+	"log/slog"
 	"strconv"
 	"strings"
 	"time"
@@ -52,7 +53,7 @@ type Event struct {
 	Delta    string
 }
 
-func NewEvent(ChatId, OwnerId int, Text, timestamp string) (*Event, error) {
+func BuildEvent(ChatId, OwnerId int, Text, timestamp string) (*Event, error) {
 	notifyAt, delta, _ := ParseTimesatmp(timestamp)
 	e, err := (&Event{
 		NewBaseFields(),
@@ -99,6 +100,32 @@ func (e *Event) Validated() (*Event, error) {
 	}
 
 	return e, nil
+}
+
+func (e *Event) UpdateNotifyAt() (string, error) {
+	notifyAt, err := time.Parse("02.01.2006 15:04:05", e.NotifyAt)
+	if err != nil {
+		return "", err
+	}
+
+	switch e.Delta {
+	case "h":
+		notifyAt = notifyAt.Add(time.Hour * 1)
+	case "d":
+		notifyAt = notifyAt.AddDate(0, 0, 1)
+	case "w":
+		notifyAt = notifyAt.AddDate(0, 0, 7)
+	case "m":
+		notifyAt = notifyAt.AddDate(0, 1, 0)
+	case "y":
+		notifyAt = notifyAt.AddDate(1, 0, 0)
+	default:
+		slog.Info("delta of value is not supported, notify date is not changed. Delta value:" + e.Delta)
+	}
+
+	e.NotifyAt = notifyAt.String()
+
+	return e.NotifyAt, nil
 }
 
 func (e *Event) GetChatIdStr() string {
